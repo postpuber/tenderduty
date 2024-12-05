@@ -502,7 +502,7 @@ func (cc *ChainConfig) watch() {
 				}
 				td.alert(
 					cc.name,
-					fmt.Sprintf("%s is no longer active: validator is %s", cc.valInfo.Moniker, inactive),
+					fmt.Sprintf("%s is no longer active: validator %s is %s for chainid %s", cc.valInfo.Moniker, cc.ValAddress, inactive, cc.ChainId),
 					"critical",
 					false,
 					&id,
@@ -510,7 +510,7 @@ func (cc *ChainConfig) watch() {
 			} else if cc.valInfo.Bonded && !cc.lastValInfo.Bonded {
 				td.alert(
 					cc.name,
-					fmt.Sprintf("%s is no longer active: validator is %s", cc.valInfo.Moniker, inactive),
+					fmt.Sprintf("%s is no longer active: validator %s is %s for chainid %s", cc.valInfo.Moniker, cc.ValAddress, inactive, cc.ChainId),
 					"info",
 					true,
 					&id,
