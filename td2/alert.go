@@ -566,7 +566,7 @@ func (cc *ChainConfig) watch() {
 				cc.name,
 				fmt.Sprintf("%s has missed > %d%% of the slashing window's blocks on %s", cc.valInfo.Moniker, cc.Alerts.Window, cc.ChainId),
 				"info",
-				false,
+				true,
 				&id,
 			)
 			cc.activeAlerts = alarms.getCount(cc.name)
