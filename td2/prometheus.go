@@ -158,7 +158,7 @@ func prometheusExporter(ctx context.Context, updates chan *promUpdate) {
 
 	promMux := http.NewServeMux()
 
-	l("serving prometheus metrics at 0.0.0.0:%d/metrics", td.PrometheusListenPort)
+	l(fmt.Sprintf("📊 Serving prometheus metrics at 0.0.0.0:%d/metrics", td.PrometheusListenPort))
 	promMux.Handle("/metrics", promhttp.Handler())
 	promSrv := &http.Server{
 		Addr:              fmt.Sprintf(":%d", td.PrometheusListenPort),
