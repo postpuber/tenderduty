@@ -74,10 +74,16 @@ func (cc *ChainConfig) GetValInfo(first bool) (err error) {
 	// Fetch info from /cosmos.staking.v1beta1.Query/Validator
 	// it's easier to ask people to provide valoper since it's readily available on
 	// explorers, so make it easy and lookup the consensus key for them.
-	cc.valInfo.Conspub, cc.valInfo.Moniker, cc.valInfo.Jailed, cc.valInfo.Bonded, err = getVal(ctx, cc.client, cc.ValAddress)
+	conspub, moniker, jailed, bonded, err := getVal(ctx, cc.client, cc.ValAddress)
 	if err != nil {
 		return
 	}
+
+	cc.valInfo.Conspub = conspub
+	cc.valInfo.Moniker = moniker
+	cc.valInfo.Jailed = jailed
+	cc.valInfo.Bonded = bonded
+
 	if first && cc.valInfo.Bonded {
 		l(fmt.Sprintf("⚙️ found %s (%s) in validator set", cc.ValAddress, cc.valInfo.Moniker))
 	} else if first && !cc.valInfo.Bonded {
