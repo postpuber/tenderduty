@@ -1,7 +1,5 @@
-
 async function loadState() {
-   const enableLogs = await fetch("logsenabled", {
-   //const enableLogs = await fetch("http://127.0.0.1:8888/logsenabled", {
+    const enableLogs = await fetch("logsenabled", {
         method: 'GET',
         mode: 'cors',
         cache: 'no-cache',
@@ -18,7 +16,7 @@ async function loadState() {
     if (showLog.enabled === false) {
         document.getElementById("logContainer").hidden = true
     }
-    //const response = await fetch("http://127.0.0.1:8888/state", {
+    
     const response = await fetch("state", {
         method: 'GET',
         mode: 'cors',
@@ -35,8 +33,8 @@ async function loadState() {
     }
     updateTable(initialState)
     drawSeries(initialState)
+    
     const logResponse = await fetch("logs", {
-    //const logResponse = await fetch("http://127.0.0.1:8888/logs", {
         method: 'GET',
         mode: 'cors',
         cache: 'no-cache',
@@ -59,13 +57,32 @@ async function loadState() {
 }
 
 const blocks = new Map();
+
+// Throttle function to limit update frequency
+function throttle(func, limit) {
+    let inThrottle;
+    return function(...args) {
+        if (!inThrottle) {
+            func.apply(this, args);
+            inThrottle = true;
+            setTimeout(() => inThrottle = false, limit);
+        }
+    }
+}
+
+// Throttled version of updateTable and drawSeries
+const throttledUpdate = throttle((status) => {
+    updateTable(status);
+    drawSeries(status);
+}, 10000); // 10 second throttle
+
 function updateTable(status) {
     for (let i = document.getElementById("statusTable").rows.length; i > 0; i--) {
         document.getElementById("statusTable").deleteRow(i-1)
     }
     const fade = `uk-animation-scale-up`
     for (let i = 0; i < status.Status.length; i++) {
-
+        // ... rest of the updateTable function remains the same ...
         let alerts = "&nbsp;"
         if (status.Status[i].active_alerts > 0 || status.Status[i].last_error !== "") {
             if (status.Status[i].last_error !== "") {
@@ -160,13 +177,12 @@ function connect() {
         if (msg.msgType === "log"){
             addLogMsg(`${new Date(msg.ts*1000).toLocaleTimeString()} - ${msg.msg}`)
         } else if (msg.msgType === "update" && document.visibilityState !== "hidden"){
-            updateTable(msg)
-            drawSeries(msg)
+            // Use the throttled update function instead of direct updates
+            throttledUpdate(msg);
         }
         event = null
     }
     const socket = new WebSocket(wsProto + location.host + '/ws');
-    //const socket = new WebSocket('ws://127.0.0.1:8888/ws');
     socket.addEventListener('message', function (event) {parse(event)});
     socket.onclose = function(e) {
         console.log('Socket is closed, retrying /ws ...', e.reason);
